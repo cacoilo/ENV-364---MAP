@@ -1,0 +1,887 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css"><link rel="stylesheet" href="css/L.Control.Locate.min.css">
+        <link rel="stylesheet" href="css/qgis2web.css"><link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="css/leaflet-search.css">
+        <link rel="stylesheet" href="css/filter.css">
+<link rel="stylesheet" href="css/nouislider.min.css">
+        <link rel="stylesheet" href="css/leaflet-control-geocoder.Geocoder.css">
+        <link rel="stylesheet" href="css/leaflet-measure.css">
+        <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        </style>
+        <title></title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script><script src="js/L.Control.Locate.min.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="js/leaflet-control-geocoder.Geocoder.js"></script>
+        <script src="js/leaflet-measure.js"></script>
+        <script src="js/proj4.js"></script>
+        <script src="js/proj4leaflet.js"></script>
+        <script src="js/leaflet-search.js"></script>
+        <script src="js/tailDT.js"></script>
+<script src="js/nouislider.min.js"></script>
+<script src="js/wNumb.js"></script>
+        <script src="data/Niagara_Falls_2021_Census__Age_Characteristics_1.js"></script>
+        <script src="data/OD_COMMUNITY_MEDICALCENTRE_2.js"></script>
+        <script>
+        var highlightLayer;
+        function highlightFeature(e) {
+            highlightLayer = e.target;
+
+            if (e.target.feature.geometry.type === 'LineString') {
+              highlightLayer.setStyle({
+                color: '#ffff00',
+              });
+            } else {
+              highlightLayer.setStyle({
+                fillColor: '#ffff00',
+                fillOpacity: 1
+              });
+            }
+            highlightLayer.openPopup();
+        }
+        var crs = new L.Proj.CRS('EPSG:2958', '+proj=utm +zone=17 +ellps=GRS80 +units=m +no_defs', {
+            resolutions: [2800, 1400, 700, 350, 175, 84, 42, 21, 11.2, 5.6, 2.8, 1.4, 0.7, 0.35, 0.14, 0.07],
+        });
+        var map = L.map('map', {
+            crs: crs,
+            continuousWorld: false,
+            worldCopyJump: false, 
+            zoomControl:true, maxZoom:28, minZoom:1
+        }).fitBounds([[42.9490116095159,-79.34951428960791],[43.157864544237775,-78.82834953682203]]);
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        L.control.locate({locateOptions: {maxZoom: 19}}).addTo(map);
+        var measureControl = new L.Control.Measure({
+            position: 'topleft',
+            primaryLengthUnit: 'meters',
+            secondaryLengthUnit: 'kilometers',
+            primaryAreaUnit: 'sqmeters',
+            secondaryAreaUnit: 'hectares'
+        });
+        measureControl.addTo(map);
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0]
+        .innerHTML = '';
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0]
+        .className += ' fas fa-ruler';
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+        }
+        map.createPane('pane_OpenStreetMap_0');
+        map.getPane('pane_OpenStreetMap_0').style.zIndex = 400;
+        var layer_OpenStreetMap_0 = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            pane: 'pane_OpenStreetMap_0',
+            opacity: 1.0,
+            attribution: '',
+            minZoom: 1,
+            maxZoom: 28,
+            minNativeZoom: 0,
+            maxNativeZoom: 19
+        });
+        layer_OpenStreetMap_0;
+        map.addLayer(layer_OpenStreetMap_0);
+        function pop_Niagara_Falls_2021_Census__Age_Characteristics_1(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Name</th>\
+                        <td>' + (feature.properties['CTNAME'] !== null ? autolinker.link(feature.properties['CTNAME'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Area</th>\
+                        <td>' + (feature.properties['LANDAREA'] !== null ? autolinker.link(feature.properties['LANDAREA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Geographic name</th>\
+                        <td>' + (feature.properties['GEO_NAME'] !== null ? autolinker.link(feature.properties['GEO_NAME'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Total median age</th>\
+                        <td>' + (feature.properties['TOT_MED_AG'] !== null ? autolinker.link(feature.properties['TOT_MED_AG'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">FE_DIST_PC</th>\
+                        <td>' + (feature.properties['FE_DIST_PC'] !== null ? autolinker.link(feature.properties['FE_DIST_PC'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_Niagara_Falls_2021_Census__Age_Characteristics_1_0(feature) {
+            if (feature.properties['TOT_MED_AG'] >= 32.000000 && feature.properties['TOT_MED_AG'] <= 35.000000 ) {
+                return {
+                pane: 'pane_Niagara_Falls_2021_Census__Age_Characteristics_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(247,251,255,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['TOT_MED_AG'] >= 35.000000 && feature.properties['TOT_MED_AG'] <= 40.000000 ) {
+                return {
+                pane: 'pane_Niagara_Falls_2021_Census__Age_Characteristics_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(209,226,243,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['TOT_MED_AG'] >= 40.000000 && feature.properties['TOT_MED_AG'] <= 45.000000 ) {
+                return {
+                pane: 'pane_Niagara_Falls_2021_Census__Age_Characteristics_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(154,200,224,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['TOT_MED_AG'] >= 45.000000 && feature.properties['TOT_MED_AG'] <= 50.000000 ) {
+                return {
+                pane: 'pane_Niagara_Falls_2021_Census__Age_Characteristics_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(82,157,204,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['TOT_MED_AG'] >= 50.000000 && feature.properties['TOT_MED_AG'] <= 55.000000 ) {
+                return {
+                pane: 'pane_Niagara_Falls_2021_Census__Age_Characteristics_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(29,108,177,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['TOT_MED_AG'] >= 55.000000 && feature.properties['TOT_MED_AG'] <= 55.200000 ) {
+                return {
+                pane: 'pane_Niagara_Falls_2021_Census__Age_Characteristics_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(8,48,107,1.0)',
+                interactive: true,
+            }
+            }
+        }
+        map.createPane('pane_Niagara_Falls_2021_Census__Age_Characteristics_1');
+        map.getPane('pane_Niagara_Falls_2021_Census__Age_Characteristics_1').style.zIndex = 401;
+        map.getPane('pane_Niagara_Falls_2021_Census__Age_Characteristics_1').style['mix-blend-mode'] = 'normal';
+        var layer_Niagara_Falls_2021_Census__Age_Characteristics_1 = new L.geoJson(json_Niagara_Falls_2021_Census__Age_Characteristics_1, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Niagara_Falls_2021_Census__Age_Characteristics_1',
+            layerName: 'layer_Niagara_Falls_2021_Census__Age_Characteristics_1',
+            pane: 'pane_Niagara_Falls_2021_Census__Age_Characteristics_1',
+            onEachFeature: pop_Niagara_Falls_2021_Census__Age_Characteristics_1,
+            style: style_Niagara_Falls_2021_Census__Age_Characteristics_1_0,
+        });
+        bounds_group.addLayer(layer_Niagara_Falls_2021_Census__Age_Characteristics_1);
+        map.addLayer(layer_Niagara_Falls_2021_Census__Age_Characteristics_1);
+        function pop_OD_COMMUNITY_MEDICALCENTRE_2(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Name</th>\
+                        <td>' + (feature.properties['Name'] !== null ? autolinker.link(feature.properties['Name'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Address</th>\
+                        <td>' + (feature.properties['Address'] !== null ? autolinker.link(feature.properties['Address'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Sub-category</th>\
+                        <td>' + (feature.properties['SUBCAT'] !== null ? autolinker.link(feature.properties['SUBCAT'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">URL</th>\
+                        <td>' + (feature.properties['URL'] !== null ? autolinker.link(feature.properties['URL'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_OD_COMMUNITY_MEDICALCENTRE_2_0(feature) {
+            switch(String(feature.properties['SUBCAT'])) {
+                case 'Hospital':
+                    return {
+                pane: 'pane_OD_COMMUNITY_MEDICALCENTRE_2',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(48,18,59,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Medical Centre':
+                    return {
+                pane: 'pane_OD_COMMUNITY_MEDICALCENTRE_2',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(40,188,235,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Other':
+                    return {
+                pane: 'pane_OD_COMMUNITY_MEDICALCENTRE_2',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(164,252,60,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Walk-In Clinic':
+                    return {
+                pane: 'pane_OD_COMMUNITY_MEDICALCENTRE_2',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(251,126,33,1.0)',
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_OD_COMMUNITY_MEDICALCENTRE_2');
+        map.getPane('pane_OD_COMMUNITY_MEDICALCENTRE_2').style.zIndex = 402;
+        map.getPane('pane_OD_COMMUNITY_MEDICALCENTRE_2').style['mix-blend-mode'] = 'normal';
+        var layer_OD_COMMUNITY_MEDICALCENTRE_2 = new L.geoJson(json_OD_COMMUNITY_MEDICALCENTRE_2, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_OD_COMMUNITY_MEDICALCENTRE_2',
+            layerName: 'layer_OD_COMMUNITY_MEDICALCENTRE_2',
+            pane: 'pane_OD_COMMUNITY_MEDICALCENTRE_2',
+            onEachFeature: pop_OD_COMMUNITY_MEDICALCENTRE_2,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_OD_COMMUNITY_MEDICALCENTRE_2_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_OD_COMMUNITY_MEDICALCENTRE_2);
+        map.addLayer(layer_OD_COMMUNITY_MEDICALCENTRE_2);
+        var osmGeocoder = new L.Control.Geocoder({
+            collapsed: true,
+            position: 'topleft',
+            text: 'Search',
+            title: 'Testing'
+        }).addTo(map);
+        document.getElementsByClassName('leaflet-control-geocoder-icon')[0]
+        .className += ' fa fa-search';
+        document.getElementsByClassName('leaflet-control-geocoder-icon')[0]
+        .title += 'Search for a place';
+        var baseMaps = {};
+        L.control.layers(baseMaps,{'OD_COMMUNITY_MEDICALCENTRE<br /><table><tr><td style="text-align: center;"><img src="legend/OD_COMMUNITY_MEDICALCENTRE_2_Hospital0.png" /></td><td>Hospital</td></tr><tr><td style="text-align: center;"><img src="legend/OD_COMMUNITY_MEDICALCENTRE_2_MedicalCentre1.png" /></td><td>Medical Centre</td></tr><tr><td style="text-align: center;"><img src="legend/OD_COMMUNITY_MEDICALCENTRE_2_Other2.png" /></td><td>Other</td></tr><tr><td style="text-align: center;"><img src="legend/OD_COMMUNITY_MEDICALCENTRE_2_WalkInClinic3.png" /></td><td>Walk-In Clinic</td></tr></table>': layer_OD_COMMUNITY_MEDICALCENTRE_2,'Niagara_Falls_2021_Census_-_Age_Characteristics<br /><table><tr><td style="text-align: center;"><img src="legend/Niagara_Falls_2021_Census__Age_Characteristics_1_32350.png" /></td><td>32 - 35</td></tr><tr><td style="text-align: center;"><img src="legend/Niagara_Falls_2021_Census__Age_Characteristics_1_35401.png" /></td><td>35 - 40</td></tr><tr><td style="text-align: center;"><img src="legend/Niagara_Falls_2021_Census__Age_Characteristics_1_40452.png" /></td><td>40 - 45</td></tr><tr><td style="text-align: center;"><img src="legend/Niagara_Falls_2021_Census__Age_Characteristics_1_45503.png" /></td><td>45 - 50</td></tr><tr><td style="text-align: center;"><img src="legend/Niagara_Falls_2021_Census__Age_Characteristics_1_50554.png" /></td><td>50 - 55</td></tr><tr><td style="text-align: center;"><img src="legend/Niagara_Falls_2021_Census__Age_Characteristics_1_555525.png" /></td><td>55 - 55.2</td></tr></table>': layer_Niagara_Falls_2021_Census__Age_Characteristics_1,"OpenStreetMap": layer_OpenStreetMap_0,}).addTo(map);
+        setBounds();
+        map.addControl(new L.Control.Search({
+            layer: layer_OD_COMMUNITY_MEDICALCENTRE_2,
+            initial: false,
+            hideMarkerOnCollapse: true,
+            propertyName: 'SUBCAT'}));
+        document.getElementsByClassName('search-button')[0].className +=
+         ' fa fa-binoculars';
+        var mapDiv = document.getElementById('map');
+        var row = document.createElement('div');
+        row.className="row";
+        row.id="all";
+        row.style.height = "100%";
+        var col1 = document.createElement('div');
+        col1.className="col9";
+        col1.id = "mapWindow";
+        col1.style.height = "99%";
+        col1.style.width = "80%";
+        col1.style.display = "inline-block";
+        var col2 = document.createElement('div');
+        col2.className="col3";
+        col2.id = "menu";
+        col2.style.display = "inline-block";
+        mapDiv.parentNode.insertBefore(row, mapDiv);
+        document.getElementById("all").appendChild(col1);
+        document.getElementById("all").appendChild(col2);
+        col1.appendChild(mapDiv)
+        var Filters = {"TOT_MED_AG": "real","LANDAREA": "real","FE_DIST_PC": "real","URL": "str","SUBCAT": "str","GEO_NAME": "str","Address": "str","Name": "str","CTNAME": "str"};
+        function filterFunc() {
+          map.eachLayer(function(lyr){
+          if ("options" in lyr && "dataVar" in lyr["options"]){
+            features = this[lyr["options"]["dataVar"]].features.slice(0);
+            try{
+              for (key in Filters){
+                keyS = key.replace(/[^a-zA-Z0-9_]/g, "")
+                if (Filters[key] == "str" || Filters[key] == "bool"){
+                  var selection = [];
+                  var options = document.getElementById("sel_" + keyS).options
+                  for (var i=0; i < options.length; i++) {
+                    if (options[i].selected) selection.push(options[i].value);
+                  }
+                    try{
+                      if (key in features[0].properties){
+                        for (i = features.length - 1;
+                          i >= 0; --i){
+                          if (selection.indexOf(
+                          features[i].properties[key])<0
+                          && selection.length>0) {
+                          features.splice(i,1);
+                          }
+                        }
+                      }
+                    } catch(err){
+                  }
+                }
+                if (Filters[key] == "int"){
+                  sliderVals =  document.getElementById(
+                    "div_" + keyS).noUiSlider.get();
+                  try{
+                    if (key in features[0].properties){
+                    for (i = features.length - 1; i >= 0; --i){
+                      if (parseInt(features[i].properties[key])
+                          < sliderVals[0]
+                          || parseInt(features[i].properties[key])
+                          > sliderVals[1]){
+                            features.splice(i,1);
+                          }
+                        }
+                      }
+                    } catch(err){
+                    }
+                  }
+                if (Filters[key] == "real"){
+                  sliderVals =  document.getElementById(
+                    "div_" + keyS).noUiSlider.get();
+                  try{
+                    if (key in features[0].properties){
+                    for (i = features.length - 1; i >= 0; --i){
+                      if (features[i].properties[key]
+                          < sliderVals[0]
+                          || features[i].properties[key]
+                          > sliderVals[1]){
+                            features.splice(i,1);
+                          }
+                        }
+                      }
+                    } catch(err){
+                    }
+                  }
+                if (Filters[key] == "date"
+                  || Filters[key] == "datetime"
+                  || Filters[key] == "time"){
+                  try{
+                    if (key in features[0].properties){
+                      HTMLkey = key.replace(/[&\/\\#,+()$~%.'":*?<>{} ]/g, '');
+                      startdate = document.getElementById("dat_" +
+                        HTMLkey + "_date1").value.replace(" ", "T");
+                      enddate = document.getElementById("dat_" +
+                        HTMLkey + "_date2").value.replace(" ", "T");
+                      for (i = features.length - 1; i >= 0; --i){
+                        if (features[i].properties[key] < startdate
+                          || features[i].properties[key] > enddate){
+                          features.splice(i,1);
+                        }
+                      }
+                    }
+                  } catch(err){
+                  }
+                }
+              }
+            } catch(err){
+            }
+          this[lyr["options"]["layerName"]].clearLayers();
+          this[lyr["options"]["layerName"]].addData(features);
+          }
+          })
+        }
+            document.getElementById("menu").appendChild(
+                document.createElement("div"));
+            var div_TOT_MED_AG = document.createElement("div");
+            div_TOT_MED_AG.id = "div_TOT_MED_AG";
+            div_TOT_MED_AG.className = "slider";
+            document.getElementById("menu").appendChild(div_TOT_MED_AG);
+            var lab_TOT_MED_AG = document.createElement('div');
+            lab_TOT_MED_AG.innerHTML  = 'TOT_MED_AG: <span id="val_TOT_MED_AG"></span>';
+            lab_TOT_MED_AG.className = 'filterlabel';
+            document.getElementById("menu").appendChild(lab_TOT_MED_AG);
+            var reset_TOT_MED_AG = document.createElement('div');
+            reset_TOT_MED_AG.innerHTML = 'clear filter';
+            reset_TOT_MED_AG.className = 'filterlabel';
+            lab_TOT_MED_AG.className = 'filterlabel';
+            reset_TOT_MED_AG.onclick = function() {
+                sel_TOT_MED_AG.noUiSlider.reset();
+            };
+            document.getElementById("menu").appendChild(reset_TOT_MED_AG);
+            var sel_TOT_MED_AG = document.getElementById('div_TOT_MED_AG');
+            noUiSlider.create(sel_TOT_MED_AG, {
+                connect: true,
+                start: [32.0, 55.2],
+                range: {
+                min: 32.0,
+                max: 55.2
+                }
+            });
+            sel_TOT_MED_AG.noUiSlider.on('update', function (values) {
+            val_TOT_MED_AG = document.getElementById('val_TOT_MED_AG');
+            val_TOT_MED_AG.innerHTML = values.join(' - ');
+                filterFunc()
+            });
+            document.getElementById("menu").appendChild(
+                document.createElement("div"));
+            var div_LANDAREA = document.createElement("div");
+            div_LANDAREA.id = "div_LANDAREA";
+            div_LANDAREA.className = "slider";
+            document.getElementById("menu").appendChild(div_LANDAREA);
+            var lab_LANDAREA = document.createElement('div');
+            lab_LANDAREA.innerHTML  = 'LANDAREA: <span id="val_LANDAREA"></span>';
+            lab_LANDAREA.className = 'filterlabel';
+            document.getElementById("menu").appendChild(lab_LANDAREA);
+            var reset_LANDAREA = document.createElement('div');
+            reset_LANDAREA.innerHTML = 'clear filter';
+            reset_LANDAREA.className = 'filterlabel';
+            lab_LANDAREA.className = 'filterlabel';
+            reset_LANDAREA.onclick = function() {
+                sel_LANDAREA.noUiSlider.reset();
+            };
+            document.getElementById("menu").appendChild(reset_LANDAREA);
+            var sel_LANDAREA = document.getElementById('div_LANDAREA');
+            noUiSlider.create(sel_LANDAREA, {
+                connect: true,
+                start: [0.8572, 108.2105],
+                range: {
+                min: 0.8572,
+                max: 108.2105
+                }
+            });
+            sel_LANDAREA.noUiSlider.on('update', function (values) {
+            val_LANDAREA = document.getElementById('val_LANDAREA');
+            val_LANDAREA.innerHTML = values.join(' - ');
+                filterFunc()
+            });
+            document.getElementById("menu").appendChild(
+                document.createElement("div"));
+            var div_FE_DIST_PC = document.createElement("div");
+            div_FE_DIST_PC.id = "div_FE_DIST_PC";
+            div_FE_DIST_PC.className = "slider";
+            document.getElementById("menu").appendChild(div_FE_DIST_PC);
+            var lab_FE_DIST_PC = document.createElement('div');
+            lab_FE_DIST_PC.innerHTML  = 'FE_DIST_PC: <span id="val_FE_DIST_PC"></span>';
+            lab_FE_DIST_PC.className = 'filterlabel';
+            document.getElementById("menu").appendChild(lab_FE_DIST_PC);
+            var reset_FE_DIST_PC = document.createElement('div');
+            reset_FE_DIST_PC.innerHTML = 'clear filter';
+            reset_FE_DIST_PC.className = 'filterlabel';
+            lab_FE_DIST_PC.className = 'filterlabel';
+            reset_FE_DIST_PC.onclick = function() {
+                sel_FE_DIST_PC.noUiSlider.reset();
+            };
+            document.getElementById("menu").appendChild(reset_FE_DIST_PC);
+            var sel_FE_DIST_PC = document.getElementById('div_FE_DIST_PC');
+            noUiSlider.create(sel_FE_DIST_PC, {
+                connect: true,
+                start: [8.5, 26.1],
+                range: {
+                min: 8.5,
+                max: 26.1
+                }
+            });
+            sel_FE_DIST_PC.noUiSlider.on('update', function (values) {
+            val_FE_DIST_PC = document.getElementById('val_FE_DIST_PC');
+            val_FE_DIST_PC.innerHTML = values.join(' - ');
+                filterFunc()
+            });
+            document.getElementById("menu").appendChild(
+                document.createElement("div"));
+            var div_URL = document.createElement('div');
+            div_URL.id = "div_URL";
+            div_URL.className= "filterselect";
+            document.getElementById("menu").appendChild(div_URL);
+            sel_URL = document.createElement('select');
+            sel_URL.multiple = true;
+            sel_URL.size = 10;
+            sel_URL.id = "sel_URL";
+            var URL_options_str = "<option value='' unselected></option>";
+            sel_URL.onchange = function(){filterFunc()};
+            URL_options_str  += '<option value="NULL">NULL</option>';
+            URL_options_str  += '<option value="http://generationsphysiotherapy.com/">http://generationsphysiotherapy.com/</option>';
+            URL_options_str  += '<option value="http://gnmi.ca/">http://gnmi.ca/</option>';
+            URL_options_str  += '<option value="http://nfchc.ca">http://nfchc.ca</option>';
+            URL_options_str  += '<option value="http://www.ferrystreetmedical.com/">http://www.ferrystreetmedical.com/</option>';
+            URL_options_str  += '<option value="http://www.lasikprovision.com/niagara/">http://www.lasikprovision.com/niagara/</option>';
+            URL_options_str  += '<option value="http://www.niagarahealth.on.ca/health/resources-niagara#adhd">http://www.niagarahealth.on.ca/health/resources-niagara#adhd</option>';
+            URL_options_str  += '<option value="http://www.niagarahealth.on.ca/services">http://www.niagarahealth.on.ca/services</option>';
+            URL_options_str  += '<option value="http://www.niagaraplasticsurgery.com/Default.aspx">http://www.niagaraplasticsurgery.com/Default.aspx</option>';
+            URL_options_str  += '<option value="http://www.niagararegion.ca/living/health_wellness/ems/default.aspx">http://www.niagararegion.ca/living/health_wellness/ems/default.aspx</option>';
+            URL_options_str  += '<option value="http://www.primarycareniagara.com/">http://www.primarycareniagara.com/</option>';
+            URL_options_str  += '<option value="http://www.twogreatwalkinclinics.ca/">http://www.twogreatwalkinclinics.ca/</option>';
+            URL_options_str  += '<option value="http://www.von.ca">http://www.von.ca</option>';
+            URL_options_str  += '<option value="http://www.walmart.ca/canada-estore/stores/storedetailcontainer.jsp?storeid">http://www.walmart.ca/canada-estore/stores/storedetailcontainer.jsp?storeid</option>';
+            URL_options_str  += '<option value="https://medimap.ca/clinics/walk-in-clinics/on/niagara-falls/medcare-clinics">https://medimap.ca/clinics/walk-in-clinics/on/niagara-falls/medcare-clinics</option>';
+            URL_options_str  += '<option value="https://medimap.ca/clinics/walk-in-clinics/on/niagara-falls/niagara-region-">https://medimap.ca/clinics/walk-in-clinics/on/niagara-falls/niagara-region-</option>';
+            URL_options_str  += '<option value="https://www.allhealthmedical.ca/">https://www.allhealthmedical.ca/</option>';
+            URL_options_str  += '<option value="https://www.facebook.com/NiagaraFallsMedicalClinic/">https://www.facebook.com/NiagaraFallsMedicalClinic/</option>';
+            URL_options_str  += '<option value="https://www.nfchc.ca/">https://www.nfchc.ca/</option>';
+            sel_URL.innerHTML = URL_options_str;
+            div_URL.appendChild(sel_URL);
+            var lab_URL = document.createElement('div');
+            lab_URL.innerHTML = 'URL';
+            lab_URL.className = 'filterlabel';
+            div_URL.appendChild(lab_URL);
+            var reset_URL = document.createElement('div');
+            reset_URL.innerHTML = 'clear filter';
+            reset_URL.className = 'filterlabel';
+            reset_URL.onclick = function() {
+                var options = document.getElementById("sel_URL").options;
+                for (var i=0; i < options.length; i++) {
+                    options[i].selected = false;
+                }
+                filterFunc();
+            };
+            div_URL.appendChild(reset_URL);
+            document.getElementById("menu").appendChild(
+                document.createElement("div"));
+            var div_SUBCAT = document.createElement('div');
+            div_SUBCAT.id = "div_SUBCAT";
+            div_SUBCAT.className= "filterselect";
+            document.getElementById("menu").appendChild(div_SUBCAT);
+            sel_SUBCAT = document.createElement('select');
+            sel_SUBCAT.multiple = true;
+            sel_SUBCAT.size = 4;
+            sel_SUBCAT.id = "sel_SUBCAT";
+            var SUBCAT_options_str = "<option value='' unselected></option>";
+            sel_SUBCAT.onchange = function(){filterFunc()};
+            SUBCAT_options_str  += '<option value="Hospital">Hospital</option>';
+            SUBCAT_options_str  += '<option value="Medical Centre">Medical Centre</option>';
+            SUBCAT_options_str  += '<option value="Other">Other</option>';
+            SUBCAT_options_str  += '<option value="Walk-In Clinic">Walk-In Clinic</option>';
+            sel_SUBCAT.innerHTML = SUBCAT_options_str;
+            div_SUBCAT.appendChild(sel_SUBCAT);
+            var lab_SUBCAT = document.createElement('div');
+            lab_SUBCAT.innerHTML = 'SUBCAT';
+            lab_SUBCAT.className = 'filterlabel';
+            div_SUBCAT.appendChild(lab_SUBCAT);
+            var reset_SUBCAT = document.createElement('div');
+            reset_SUBCAT.innerHTML = 'clear filter';
+            reset_SUBCAT.className = 'filterlabel';
+            reset_SUBCAT.onclick = function() {
+                var options = document.getElementById("sel_SUBCAT").options;
+                for (var i=0; i < options.length; i++) {
+                    options[i].selected = false;
+                }
+                filterFunc();
+            };
+            div_SUBCAT.appendChild(reset_SUBCAT);
+            document.getElementById("menu").appendChild(
+                document.createElement("div"));
+            var div_GEO_NAME = document.createElement('div');
+            div_GEO_NAME.id = "div_GEO_NAME";
+            div_GEO_NAME.className= "filterselect";
+            document.getElementById("menu").appendChild(div_GEO_NAME);
+            sel_GEO_NAME = document.createElement('select');
+            sel_GEO_NAME.multiple = true;
+            sel_GEO_NAME.size = 10;
+            sel_GEO_NAME.id = "sel_GEO_NAME";
+            var GEO_NAME_options_str = "<option value='' unselected></option>";
+            sel_GEO_NAME.onchange = function(){filterFunc()};
+            GEO_NAME_options_str  += '<option value="5390200.00">5390200.00</option>';
+            GEO_NAME_options_str  += '<option value="5390201.00">5390201.00</option>';
+            GEO_NAME_options_str  += '<option value="5390202.00">5390202.00</option>';
+            GEO_NAME_options_str  += '<option value="5390203.01">5390203.01</option>';
+            GEO_NAME_options_str  += '<option value="5390203.02">5390203.02</option>';
+            GEO_NAME_options_str  += '<option value="5390204.00">5390204.00</option>';
+            GEO_NAME_options_str  += '<option value="5390205.00">5390205.00</option>';
+            GEO_NAME_options_str  += '<option value="5390206.00">5390206.00</option>';
+            GEO_NAME_options_str  += '<option value="5390207.00">5390207.00</option>';
+            GEO_NAME_options_str  += '<option value="5390208.00">5390208.00</option>';
+            GEO_NAME_options_str  += '<option value="5390209.03">5390209.03</option>';
+            GEO_NAME_options_str  += '<option value="5390209.04">5390209.04</option>';
+            GEO_NAME_options_str  += '<option value="5390209.05">5390209.05</option>';
+            GEO_NAME_options_str  += '<option value="5390209.06">5390209.06</option>';
+            GEO_NAME_options_str  += '<option value="5390210.01">5390210.01</option>';
+            GEO_NAME_options_str  += '<option value="5390210.02">5390210.02</option>';
+            GEO_NAME_options_str  += '<option value="5390211.00">5390211.00</option>';
+            GEO_NAME_options_str  += '<option value="5390212.00">5390212.00</option>';
+            GEO_NAME_options_str  += '<option value="5390213.00">5390213.00</option>';
+            GEO_NAME_options_str  += '<option value="5390214.00">5390214.00</option>';
+            GEO_NAME_options_str  += '<option value="5390215.00">5390215.00</option>';
+            sel_GEO_NAME.innerHTML = GEO_NAME_options_str;
+            div_GEO_NAME.appendChild(sel_GEO_NAME);
+            var lab_GEO_NAME = document.createElement('div');
+            lab_GEO_NAME.innerHTML = 'GEO_NAME';
+            lab_GEO_NAME.className = 'filterlabel';
+            div_GEO_NAME.appendChild(lab_GEO_NAME);
+            var reset_GEO_NAME = document.createElement('div');
+            reset_GEO_NAME.innerHTML = 'clear filter';
+            reset_GEO_NAME.className = 'filterlabel';
+            reset_GEO_NAME.onclick = function() {
+                var options = document.getElementById("sel_GEO_NAME").options;
+                for (var i=0; i < options.length; i++) {
+                    options[i].selected = false;
+                }
+                filterFunc();
+            };
+            div_GEO_NAME.appendChild(reset_GEO_NAME);
+            document.getElementById("menu").appendChild(
+                document.createElement("div"));
+            var div_Address = document.createElement('div');
+            div_Address.id = "div_Address";
+            div_Address.className= "filterselect";
+            document.getElementById("menu").appendChild(div_Address);
+            sel_Address = document.createElement('select');
+            sel_Address.multiple = true;
+            sel_Address.size = 10;
+            sel_Address.id = "sel_Address";
+            var Address_options_str = "<option value='' unselected></option>";
+            sel_Address.onchange = function(){filterFunc()};
+            Address_options_str  += '<option value="2722 ST PAUL AV">2722 ST PAUL AV</option>';
+            Address_options_str  += '<option value="4256 PORTAGE RD">4256 PORTAGE RD</option>';
+            Address_options_str  += '<option value="4481 QUEEN ST">4481 QUEEN ST</option>';
+            Address_options_str  += '<option value="4790 VICTORIA AV">4790 VICTORIA AV</option>';
+            Address_options_str  += '<option value="4796-4800 VICTORIA AV
+">4796-4800 VICTORIA AV
+</option>';
+            Address_options_str  += '<option value="4926-4932 VICTORIA AV">4926-4932 VICTORIA AV</option>';
+            Address_options_str  += '<option value="5400 PORTAGE RD">5400 PORTAGE RD</option>';
+            Address_options_str  += '<option value="5546 PORTAGE RD">5546 PORTAGE RD</option>';
+            Address_options_str  += '<option value="5547 PORTAGE RD">5547 PORTAGE RD</option>';
+            Address_options_str  += '<option value="5668 MAIN ST">5668 MAIN ST</option>';
+            Address_options_str  += '<option value="5710 KITCHENER ST">5710 KITCHENER ST</option>';
+            Address_options_str  += '<option value="5841-5845 FERRY ST">5841-5845 FERRY ST</option>';
+            Address_options_str  += '<option value="6055 MAIN ST">6055 MAIN ST</option>';
+            Address_options_str  += '<option value="6150 VALLEY WY">6150 VALLEY WY</option>';
+            Address_options_str  += '<option value="6453 MORRISON ST">6453 MORRISON ST</option>';
+            Address_options_str  += '<option value="6800 MORRISON ST">6800 MORRISON ST</option>';
+            Address_options_str  += '<option value="7481 OAKWOOD DR">7481 OAKWOOD DR</option>';
+            Address_options_str  += '<option value="7555 MONTROSE RD">7555 MONTROSE RD</option>';
+            Address_options_str  += '<option value="8279 LUNDY&apos;S LN">8279 LUNDY&apos;S LN</option>';
+            sel_Address.innerHTML = Address_options_str;
+            div_Address.appendChild(sel_Address);
+            var lab_Address = document.createElement('div');
+            lab_Address.innerHTML = 'Address';
+            lab_Address.className = 'filterlabel';
+            div_Address.appendChild(lab_Address);
+            var reset_Address = document.createElement('div');
+            reset_Address.innerHTML = 'clear filter';
+            reset_Address.className = 'filterlabel';
+            reset_Address.onclick = function() {
+                var options = document.getElementById("sel_Address").options;
+                for (var i=0; i < options.length; i++) {
+                    options[i].selected = false;
+                }
+                filterFunc();
+            };
+            div_Address.appendChild(reset_Address);
+            document.getElementById("menu").appendChild(
+                document.createElement("div"));
+            var div_Name = document.createElement('div');
+            div_Name.id = "div_Name";
+            div_Name.className= "filterselect";
+            document.getElementById("menu").appendChild(div_Name);
+            sel_Name = document.createElement('select');
+            sel_Name.multiple = true;
+            sel_Name.size = 10;
+            sel_Name.id = "sel_Name";
+            var Name_options_str = "<option value='' unselected></option>";
+            sel_Name.onchange = function(){filterFunc()};
+            Name_options_str  += '<option value="All Health Pharmacy and Clinic">All Health Pharmacy and Clinic</option>';
+            Name_options_str  += '<option value="Cardiac Diagnostic Clinic">Cardiac Diagnostic Clinic</option>';
+            Name_options_str  += '<option value="Ferry Street Medical Clinic">Ferry Street Medical Clinic</option>';
+            Name_options_str  += '<option value="GMNI Greater Niagara Medical Imaging">GMNI Greater Niagara Medical Imaging</option>';
+            Name_options_str  += '<option value="Generations Sport & Spine">Generations Sport & Spine</option>';
+            Name_options_str  += '<option value="Greater Niagara General Hospital">Greater Niagara General Hospital</option>';
+            Name_options_str  += '<option value="Lasik Provision Niagara">Lasik Provision Niagara</option>';
+            Name_options_str  += '<option value="MedCare Clinics">MedCare Clinics</option>';
+            Name_options_str  += '<option value="Morrison Medical Centre">Morrison Medical Centre</option>';
+            Name_options_str  += '<option value="Morrison Street Walk-in Clinic">Morrison Street Walk-in Clinic</option>';
+            Name_options_str  += '<option value="NEMS - Niagara Falls North Satellite Base">NEMS - Niagara Falls North Satellite Base</option>';
+            Name_options_str  += '<option value="Niagara Falls Community Health Ccentre">Niagara Falls Community Health Ccentre</option>';
+            Name_options_str  += '<option value="Niagara Falls Community Health Centre">Niagara Falls Community Health Centre</option>';
+            Name_options_str  += '<option value="Niagara Falls Medical Clinic">Niagara Falls Medical Clinic</option>';
+            Name_options_str  += '<option value="Niagara Plastic Surgery Centre">Niagara Plastic Surgery Centre</option>';
+            Name_options_str  += '<option value="Niagara Region Medical">Niagara Region Medical</option>';
+            Name_options_str  += '<option value="Portage Walk-in Clinic">Portage Walk-in Clinic</option>';
+            Name_options_str  += '<option value="Primary Care Niagara - Niagara Falls">Primary Care Niagara - Niagara Falls</option>';
+            Name_options_str  += '<option value="Regional Niagara Public Health - Satellite Office">Regional Niagara Public Health - Satellite Office</option>';
+            Name_options_str  += '<option value="Stamford Medical Centre">Stamford Medical Centre</option>';
+            Name_options_str  += '<option value="Victorian Order Of Nurses - Hamilton Niagara">Victorian Order Of Nurses - Hamilton Niagara</option>';
+            Name_options_str  += '<option value="Walmart Medical Clinic">Walmart Medical Clinic</option>';
+            sel_Name.innerHTML = Name_options_str;
+            div_Name.appendChild(sel_Name);
+            var lab_Name = document.createElement('div');
+            lab_Name.innerHTML = 'Name';
+            lab_Name.className = 'filterlabel';
+            div_Name.appendChild(lab_Name);
+            var reset_Name = document.createElement('div');
+            reset_Name.innerHTML = 'clear filter';
+            reset_Name.className = 'filterlabel';
+            reset_Name.onclick = function() {
+                var options = document.getElementById("sel_Name").options;
+                for (var i=0; i < options.length; i++) {
+                    options[i].selected = false;
+                }
+                filterFunc();
+            };
+            div_Name.appendChild(reset_Name);
+            document.getElementById("menu").appendChild(
+                document.createElement("div"));
+            var div_CTNAME = document.createElement('div');
+            div_CTNAME.id = "div_CTNAME";
+            div_CTNAME.className= "filterselect";
+            document.getElementById("menu").appendChild(div_CTNAME);
+            sel_CTNAME = document.createElement('select');
+            sel_CTNAME.multiple = true;
+            sel_CTNAME.size = 10;
+            sel_CTNAME.id = "sel_CTNAME";
+            var CTNAME_options_str = "<option value='' unselected></option>";
+            sel_CTNAME.onchange = function(){filterFunc()};
+            CTNAME_options_str  += '<option value="0200.00">0200.00</option>';
+            CTNAME_options_str  += '<option value="0201.00">0201.00</option>';
+            CTNAME_options_str  += '<option value="0202.00">0202.00</option>';
+            CTNAME_options_str  += '<option value="0203.01">0203.01</option>';
+            CTNAME_options_str  += '<option value="0203.02">0203.02</option>';
+            CTNAME_options_str  += '<option value="0204.00">0204.00</option>';
+            CTNAME_options_str  += '<option value="0205.00">0205.00</option>';
+            CTNAME_options_str  += '<option value="0206.00">0206.00</option>';
+            CTNAME_options_str  += '<option value="0207.00">0207.00</option>';
+            CTNAME_options_str  += '<option value="0208.00">0208.00</option>';
+            CTNAME_options_str  += '<option value="0209.03">0209.03</option>';
+            CTNAME_options_str  += '<option value="0209.04">0209.04</option>';
+            CTNAME_options_str  += '<option value="0209.05">0209.05</option>';
+            CTNAME_options_str  += '<option value="0209.06">0209.06</option>';
+            CTNAME_options_str  += '<option value="0210.01">0210.01</option>';
+            CTNAME_options_str  += '<option value="0210.02">0210.02</option>';
+            CTNAME_options_str  += '<option value="0211.00">0211.00</option>';
+            CTNAME_options_str  += '<option value="0212.00">0212.00</option>';
+            CTNAME_options_str  += '<option value="0213.00">0213.00</option>';
+            CTNAME_options_str  += '<option value="0214.00">0214.00</option>';
+            CTNAME_options_str  += '<option value="0215.00">0215.00</option>';
+            sel_CTNAME.innerHTML = CTNAME_options_str;
+            div_CTNAME.appendChild(sel_CTNAME);
+            var lab_CTNAME = document.createElement('div');
+            lab_CTNAME.innerHTML = 'CTNAME';
+            lab_CTNAME.className = 'filterlabel';
+            div_CTNAME.appendChild(lab_CTNAME);
+            var reset_CTNAME = document.createElement('div');
+            reset_CTNAME.innerHTML = 'clear filter';
+            reset_CTNAME.className = 'filterlabel';
+            reset_CTNAME.onclick = function() {
+                var options = document.getElementById("sel_CTNAME").options;
+                for (var i=0; i < options.length; i++) {
+                    options[i].selected = false;
+                }
+                filterFunc();
+            };
+            div_CTNAME.appendChild(reset_CTNAME);
+        </script>
+    </body>
+</html>
